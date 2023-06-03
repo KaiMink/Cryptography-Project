@@ -1,4 +1,5 @@
 import binascii
+import gridfs
 from dilithium import Dilithium3
 from pymongo import MongoClient
 
@@ -21,13 +22,18 @@ def main():
             PublisherPermission(signature_collection)
         if(command == "/verify"):
             RecepientPermission(signature_collection)
-        else: print("Command not found!")
+        else: 
+            print("Command not found admin!")
     else:
+        command = input()
         if(command =="/publish"):
             print("Permission denied")
         if(command=="/verify"):
             RecepientPermission(signature_collection)
-        else: print("Command not found!") 
+        if(command=="/download"):
+            download_file(signature_collection)
+        else: 
+            print("Command not found client!") 
         #if(command == "/download"):
     return main()
     # Generate keys
@@ -37,9 +43,13 @@ def PublisherPermission(collection):
         # Load PDF file to sign
         print("File path:")
         path =input()
+        print("File name:")
+        file_name = input()
+        fs = gridfs.GridFS(collection.database)
     
         with open(path, "rb") as file:
             pdf_file = file.read()
+            file_id = fs.put(pdf_file, filename = file_name)
         sig = Dilithium3.sign(sk, pdf_file)
         sig_hex = binascii.hexlify(sig).decode('utf-8')
         collection.insert_one({
@@ -55,6 +65,7 @@ def PublisherPermission(collection):
 def RecepientPermission(collection):
     print("File path:")
     path = input()
+    
     flag = 0
     try:
         for document in collection.find():
@@ -71,11 +82,23 @@ def RecepientPermission(collection):
                 flag+=1
         if(flag != 0):
             print("false")
-        
-
              
     except:
         print("File khong hop le")
 
+def download_file(collection):
+    print("File name:")
+    file_name = input()
+
+    fs = gridfs.GridFS(collection.database)
+    file = fs.find_one({"filename": file_name})
+
+    if file:
+        with open(file_name+".pdf", "wb") as f:
+            f.write(file.read())
+        print("Downloaded successfully!")
+    else:
+        print("File not found!")
+    
 if __name__ == "__main__":
     main()
