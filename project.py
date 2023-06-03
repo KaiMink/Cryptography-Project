@@ -4,24 +4,36 @@ from pymongo import MongoClient
 
 def main():
     # Connect to MongoDB
-    
+    print("Account:")
     account = input()
     CONNECTION_STRING = "mongodb+srv://DuuuKieee:899767147@loginserver.hqnkiia.mongodb.net/?retryWrites=true&w=majority"
     client = MongoClient(CONNECTION_STRING)
     dbname = "CryptoProject"
     db = client[dbname]
     signature_collection = db["SignatureCollection"]
+    if(input() == "/help"):
+        print("/publish: to publish file if you are admin!")
+        print("/verify: verify the file you have!")
     if(account == "admin"):
-        PublisherPermission(signature_collection)
+        command = input()
+        if(command == "/publish"):
+            PublisherPermission(signature_collection)
+        if(command == "/verify"):
+            RecepientPermission(signature_collection)
+        else: print("Command not found!")
     else:
-        RecepientPermission(signature_collection)
-
+        if(command =="/publish"):
+            print("Permission denied")
+        if(command=="/verify"):
+            RecepientPermission(signature_collection)
+        else: print("Command not found!") 
+    return main()
     # Generate keys
 def PublisherPermission(collection):
     try:
         pk, sk = Dilithium3.keygen()
         # Load PDF file to sign
-        print("Nhap duong dan")
+        print("File path:")
         path =input()
     
         with open(path, "rb") as file:
@@ -32,12 +44,14 @@ def PublisherPermission(collection):
         "signature": sig_hex,
         "public_key": binascii.hexlify(pk).decode('utf-8')
     })
+        print("Pulished!")
     except:
         print("Duong dan khong hop le")
 
     #     # Upload signature to MongoDB
 
 def RecepientPermission(collection):
+    print("File path:")
     path = input()
     flag = 0
     try:
