@@ -12,6 +12,7 @@ def main():
     dbname = "CryptoProject"
     db = client[dbname]
     signature_collection = db["SignatureCollection"]
+    file_collection = db["fs.files"]
     if(input() == "/help"):
         print("/publish: to publish file if you are admin!")
         print("/verify: verify the file you have!")
@@ -31,10 +32,9 @@ def main():
         if(command=="/verify"):
             RecepientPermission(signature_collection)
         if(command=="/download"):
-            download_file(signature_collection)
+            download_file(file_collection)
         else: 
             print("Command not found client!") 
-        #if(command == "/download"):
     return main()
     # Generate keys
 def PublisherPermission(collection):
@@ -87,9 +87,9 @@ def RecepientPermission(collection):
         print("File khong hop le")
 
 def download_file(collection):
+    list_files(collection)
     print("File name:")
     file_name = input()
-
     fs = gridfs.GridFS(collection.database)
     file = fs.find_one({"filename": file_name})
 
@@ -99,6 +99,12 @@ def download_file(collection):
         print("Downloaded successfully!")
     else:
         print("File not found!")
-    
+
+def list_files(collection):
+    print("Available files:")
+    for i, document in enumerate(collection.find(), 1):
+        file_name = document["filename"]
+        file_date = document["uploadDate"]
+        print(f"{i}: {file_name} (Uploaded on: {file_date})")
 if __name__ == "__main__":
     main()
