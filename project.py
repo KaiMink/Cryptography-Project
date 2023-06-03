@@ -14,6 +14,7 @@ def main():
     if(input() == "/help"):
         print("/publish: to publish file if you are admin!")
         print("/verify: verify the file you have!")
+        print("/download: download file by name")
     if(account == "admin"):
         command = input()
         if(command == "/publish"):
@@ -27,6 +28,7 @@ def main():
         if(command=="/verify"):
             RecepientPermission(signature_collection)
         else: print("Command not found!") 
+        #if(command == "/download"):
     return main()
     # Generate keys
 def PublisherPermission(collection):
