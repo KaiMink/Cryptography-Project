@@ -13,25 +13,30 @@ def main():
     db = client[dbname]
     signature_collection = db["SignatureCollection"]
     file_collection = db["fs.files"]
-    if(input() == "/help"):
+    print ("Command:")
+    command = input()
+
+    if(command == "/help"):
         print("/publish: to publish file if you are admin!")
         print("/verify: verify the file you have!")
         print("/download: download file by name")
+        return main()
+    
     if(account == "admin"):
-        command = input()
         if(command == "/publish"):
             PublisherPermission(signature_collection)
-        if(command == "/verify"):
+        elif(command == "/verify"):
             RecepientPermission(signature_collection)
+        elif(command=="/download"):
+            download_file(file_collection)
         else: 
             print("Command not found admin!")
     else:
-        command = input()
         if(command =="/publish"):
             print("Permission denied")
-        if(command=="/verify"):
+        elif(command=="/verify"):
             RecepientPermission(signature_collection)
-        if(command=="/download"):
+        elif(command=="/download"):
             download_file(file_collection)
         else: 
             print("Command not found client!") 
